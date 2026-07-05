@@ -1,0 +1,63 @@
+name: API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  restassured-tests:
+    name: REST Assured + TestNG (Maven)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run REST Assured test suite
+        run: mvn -B -f restassured/pom.xml test
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: restassured/target/surefire-reports/
+          if-no-files-found: ignore
+
+  postman-tests:
+    name: Postman Collection (Newman)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman and HTML reporter
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Postman collection
+        run: >
+          newman run postman/qa-api-restassured.postman_collection.json
+          -e postman/qa-api-restassured.postman_environment.json
+          --reporters cli,htmlextra
+          --reporter-htmlextra-export newman/report.html
+
+      - name: Upload Newman HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman/
+          if-no-files-found: ignore

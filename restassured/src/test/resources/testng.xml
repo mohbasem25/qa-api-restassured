@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="qa-api-restassured Suite" parallel="classes" thread-count="2" verbose="1">
+
+    <test name="Users API Tests">
+        <classes>
+            <class name="tests.UsersGetTests"/>
+            <class name="tests.UsersCreateUpdateDeleteTests"/>
+        </classes>
+    </test>
+
+    <test name="Auth API Tests">
+        <classes>
+            <class name="tests.AuthTests"/>
+        </classes>
+    </test>
+
+    <test name="Schema Validation Tests">
+        <classes>
+            <class name="tests.SchemaValidationTests"/>
+        </classes>
+    </test>
+
+</suite>

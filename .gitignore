@@ -1,0 +1,23 @@
+# Java / Maven
+target/
+*.class
+*.iml
+.idea/
+*.log
+
+# Test output
+test-output/
+surefire-reports/
+
+# Node / Newman
+node_modules/
+newman/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.swp
