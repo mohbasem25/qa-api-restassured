@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "5e6b2a10-3f8a-4b6a-9d2e-7c1a9b4d3e21",
-    "name": "qa-api-restassured (reqres.in)",
-    "description": "Postman/Newman API test collection for reqres.in, covering Users CRUD, Auth, and Colors endpoints. Companion to the REST Assured + TestNG framework in this repository -- demonstrates quick, collaborative, exploratory API testing with chained requests and inline test scripts.",
+    "name": "qa-api-restassured (dummyjson.com)",
+    "description": "Postman/Newman API test collection for dummyjson.com, covering Users CRUD, Auth, and Products endpoints. Companion to the REST Assured + TestNG framework in this repository -- demonstrates quick, collaborative, exploratory API testing with chained requests and inline test scripts. dummyjson.com is a genuinely free, no-API-key-required public test API, making it suitable for an unauthenticated, publicly-runnable CI pipeline.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -10,7 +10,7 @@
       "name": "Users - Read",
       "item": [
         {
-          "name": "List users - page 1",
+          "name": "List users - skip 0",
           "event": [
             {
               "listen": "test",
@@ -31,33 +31,32 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('page field equals 1', function () {",
-                  "    pm.expect(jsonData.page).to.eql(1);",
+                  "pm.test('skip field equals 0', function () {",
+                  "    pm.expect(jsonData.skip).to.eql(0);",
                   "});",
                   "",
-                  "pm.test('data array is not empty', function () {",
-                  "    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;",
+                  "pm.test('users array is not empty', function () {",
+                  "    pm.expect(jsonData.users).to.be.an('array').that.is.not.empty;",
                   "});",
                   "",
                   "pm.test('each user has required fields', function () {",
-                  "    jsonData.data.forEach(function (user) {",
+                  "    jsonData.users.forEach(function (user) {",
                   "        pm.expect(user).to.have.property('id');",
                   "        pm.expect(user).to.have.property('email');",
-                  "        pm.expect(user).to.have.property('first_name');",
-                  "        pm.expect(user).to.have.property('last_name');",
-                  "        pm.expect(user).to.have.property('avatar');",
+                  "        pm.expect(user).to.have.property('firstName');",
+                  "        pm.expect(user).to.have.property('lastName');",
+                  "        pm.expect(user).to.have.property('image');",
                   "    });",
                   "});",
                   "",
                   "var schema = {",
                   "    type: 'object',",
-                  "    required: ['page', 'per_page', 'total', 'total_pages', 'data'],",
+                  "    required: ['total', 'skip', 'limit', 'users'],",
                   "    properties: {",
-                  "        page: { type: 'integer' },",
-                  "        per_page: { type: 'integer' },",
                   "        total: { type: 'integer' },",
-                  "        total_pages: { type: 'integer' },",
-                  "        data: { type: 'array' }",
+                  "        skip: { type: 'integer' },",
+                  "        limit: { type: 'integer' },",
+                  "        users: { type: 'array' }",
                   "    }",
                   "};",
                   "",
@@ -70,29 +69,28 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users?page=1",
+              "raw": "{{baseUrl}}/users?limit=10&skip=0",
               "host": ["{{baseUrl}}"],
               "path": ["users"],
               "query": [
                 {
-                  "key": "page",
-                  "value": "1"
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
                 }
               ]
             },
-            "description": "Retrieves page 1 of the paginated users list."
+            "description": "Retrieves the first page (skip=0) of the paginated users list."
           },
           "response": []
         },
         {
-          "name": "List users - page 2",
+          "name": "List users - skip 10",
           "event": [
             {
               "listen": "test",
@@ -103,8 +101,8 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('page field equals 2', function () {",
-                  "    pm.expect(pm.response.json().page).to.eql(2);",
+                  "pm.test('skip field equals 10', function () {",
+                  "    pm.expect(pm.response.json().skip).to.eql(10);",
                   "});",
                   "",
                   "pm.test('Response time is below 3000ms', function () {",
@@ -116,20 +114,19 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users?page=2",
+              "raw": "{{baseUrl}}/users?limit=10&skip=10",
               "host": ["{{baseUrl}}"],
               "path": ["users"],
               "query": [
                 {
-                  "key": "page",
-                  "value": "2"
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "10"
                 }
               ]
             }
@@ -151,16 +148,16 @@
                   "var jsonData = pm.response.json();",
                   "",
                   "pm.test('returned user id matches requested id', function () {",
-                  "    pm.expect(jsonData.data.id).to.eql(2);",
+                  "    pm.expect(jsonData.id).to.eql(2);",
                   "});",
                   "",
                   "pm.test('user email is a valid-looking email', function () {",
-                  "    pm.expect(jsonData.data.email).to.match(/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/);",
+                  "    pm.expect(jsonData.email).to.match(/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/);",
                   "});",
                   "",
-                  "pm.test('support object is present', function () {",
-                  "    pm.expect(jsonData).to.have.property('support');",
-                  "    pm.expect(jsonData.support).to.have.property('url');",
+                  "pm.test('firstName and lastName are present', function () {",
+                  "    pm.expect(jsonData).to.have.property('firstName');",
+                  "    pm.expect(jsonData).to.have.property('lastName');",
                   "});"
                 ]
               }
@@ -168,12 +165,7 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/users/2",
               "host": ["{{baseUrl}}"],
@@ -183,7 +175,7 @@
           "response": []
         },
         {
-          "name": "Get single user - not found (id=23)",
+          "name": "Get single user - not found (id=999)",
           "event": [
             {
               "listen": "test",
@@ -194,8 +186,8 @@
                   "    pm.response.to.have.status(404);",
                   "});",
                   "",
-                  "pm.test('Response body is an empty object', function () {",
-                  "    pm.expect(pm.response.text()).to.eql('{}');",
+                  "pm.test('Response body has descriptive not-found message', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql(\"User with id '999' not found\");",
                   "});"
                 ]
               }
@@ -203,16 +195,11 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/23",
+              "raw": "{{baseUrl}}/users/999",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "23"]
+              "path": ["users", "999"]
             }
           },
           "response": []
@@ -223,7 +210,7 @@
       "name": "Users - Write (chained)",
       "item": [
         {
-          "name": "Create user",
+          "name": "Create user (simulated)",
           "event": [
             {
               "listen": "test",
@@ -236,18 +223,19 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('response echoes submitted name and job', function () {",
-                  "    pm.expect(jsonData.name).to.eql('Morpheus');",
-                  "    pm.expect(jsonData.job).to.eql('Leader');",
+                  "pm.test('response echoes submitted firstName and lastName', function () {",
+                  "    pm.expect(jsonData.firstName).to.eql('Morpheus');",
+                  "    pm.expect(jsonData.lastName).to.eql('Leader');",
                   "});",
                   "",
-                  "pm.test('id and createdAt are present', function () {",
+                  "pm.test('id is present', function () {",
                   "    pm.expect(jsonData).to.have.property('id');",
-                  "    pm.expect(jsonData).to.have.property('createdAt');",
                   "});",
                   "",
-                  "// Chain the created user id into a collection/environment variable",
-                  "// for reuse by the Update and Delete requests below.",
+                  "// Chain the (simulated, non-persisted) created user id into an",
+                  "// environment variable for reuse by the Update/Delete requests",
+                  "// below -- narratively mirrors a real create->update->delete flow,",
+                  "// even though dummyjson.com does not actually persist the record.",
                   "pm.environment.set('createdUserId', jsonData.id);"
                 ]
               }
@@ -257,17 +245,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Morpheus\",\n    \"job\": \"Leader\"\n}",
+              "raw": "{\n    \"firstName\": \"Morpheus\",\n    \"lastName\": \"Leader\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -275,15 +259,15 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/users/add",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["users", "add"]
             }
           },
           "response": []
         },
         {
-          "name": "Update user (PUT) - uses createdUserId",
+          "name": "Update user (PUT) - full update on id=2",
           "event": [
             {
               "listen": "test",
@@ -296,13 +280,13 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('response echoes updated name and job', function () {",
-                  "    pm.expect(jsonData.name).to.eql('Neo');",
-                  "    pm.expect(jsonData.job).to.eql('The One');",
+                  "pm.test('response echoes updated firstName and lastName', function () {",
+                  "    pm.expect(jsonData.firstName).to.eql('Neo');",
+                  "    pm.expect(jsonData.lastName).to.eql('Anderson');",
                   "});",
                   "",
-                  "pm.test('updatedAt is present', function () {",
-                  "    pm.expect(jsonData).to.have.property('updatedAt');",
+                  "pm.test('id matches the updated user', function () {",
+                  "    pm.expect(jsonData.id).to.eql(2);",
                   "});"
                 ]
               }
@@ -312,17 +296,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Neo\",\n    \"job\": \"The One\"\n}",
+              "raw": "{\n    \"firstName\": \"Neo\",\n    \"lastName\": \"Anderson\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -330,15 +310,16 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/users/{{createdUserId}}",
+              "raw": "{{baseUrl}}/users/2",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "{{createdUserId}}"]
-            }
+              "path": ["users", "2"]
+            },
+            "description": "dummyjson.com does not persist the id from 'Create user (simulated)', so writes are exercised against a known existing user id."
           },
           "response": []
         },
         {
-          "name": "Update user (PATCH) - uses createdUserId",
+          "name": "Update user (PATCH) - partial update on id=2",
           "event": [
             {
               "listen": "test",
@@ -351,12 +332,12 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('response echoes patched job', function () {",
-                  "    pm.expect(jsonData.job).to.eql('Hacker');",
+                  "pm.test('response echoes patched lastName', function () {",
+                  "    pm.expect(jsonData.lastName).to.eql('Hacker');",
                   "});",
                   "",
-                  "pm.test('updatedAt is present', function () {",
-                  "    pm.expect(jsonData).to.have.property('updatedAt');",
+                  "pm.test('id matches the updated user', function () {",
+                  "    pm.expect(jsonData.id).to.eql(2);",
                   "});"
                 ]
               }
@@ -366,17 +347,13 @@
             "method": "PATCH",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"job\": \"Hacker\"\n}",
+              "raw": "{\n    \"lastName\": \"Hacker\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -384,27 +361,33 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/users/{{createdUserId}}",
+              "raw": "{{baseUrl}}/users/2",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "{{createdUserId}}"]
+              "path": ["users", "2"]
             }
           },
           "response": []
         },
         {
-          "name": "Delete user - uses createdUserId",
+          "name": "Delete user - id=2",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 204', function () {",
-                  "    pm.response.to.have.status(204);",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Response body is empty', function () {",
-                  "    pm.expect(pm.response.text()).to.eql('');",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test('isDeleted flag is true', function () {",
+                  "    pm.expect(jsonData.isDeleted).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('deletedOn timestamp is present', function () {",
+                  "    pm.expect(jsonData).to.have.property('deletedOn');",
                   "});",
                   "",
                   "pm.test('Response time is below 3000ms', function () {",
@@ -416,16 +399,11 @@
           ],
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/{{createdUserId}}",
+              "raw": "{{baseUrl}}/users/2",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "{{createdUserId}}"]
+              "path": ["users", "2"]
             }
           },
           "response": []
@@ -449,13 +427,17 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('token is present and non-empty', function () {",
-                  "    pm.expect(jsonData).to.have.property('token');",
-                  "    pm.expect(jsonData.token.length).to.be.above(0);",
+                  "pm.test('accessToken is present and non-empty', function () {",
+                  "    pm.expect(jsonData).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.accessToken.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('username matches the logged-in user', function () {",
+                  "    pm.expect(jsonData.username).to.eql('emilys');",
                   "});",
                   "",
                   "// Chain the token for potential reuse by later authenticated requests.",
-                  "pm.environment.set('authToken', jsonData.token);"
+                  "pm.environment.set('authToken', jsonData.accessToken);"
                 ]
               }
             }
@@ -464,17 +446,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"eve.holt@reqres.in\",\n    \"password\": \"cityslicka\"\n}",
+              "raw": "{\n    \"username\": \"emilys\",\n    \"password\": \"emilyspass\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -482,9 +460,53 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/login",
+              "raw": "{{baseUrl}}/auth/login",
               "host": ["{{baseUrl}}"],
-              "path": ["login"]
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - wrong password (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('error message indicates invalid credentials', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Invalid credentials');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"emilys\",\n    \"password\": \"wrongpassword\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
             }
           },
           "response": []
@@ -501,8 +523,8 @@
                   "    pm.response.to.have.status(400);",
                   "});",
                   "",
-                  "pm.test('error message indicates missing password', function () {",
-                  "    pm.expect(pm.response.json().error).to.eql('Missing password');",
+                  "pm.test('error message indicates username and password required', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Username and password required');",
                   "});"
                 ]
               }
@@ -512,17 +534,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"eve.holt@reqres.in\"\n}",
+              "raw": "{\n    \"username\": \"emilys\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -530,108 +548,9 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/login",
+              "raw": "{{baseUrl}}/auth/login",
               "host": ["{{baseUrl}}"],
-              "path": ["login"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Register - success",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "var jsonData = pm.response.json();",
-                  "",
-                  "pm.test('id and token are present', function () {",
-                  "    pm.expect(jsonData).to.have.property('id');",
-                  "    pm.expect(jsonData).to.have.property('token');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"eve.holt@reqres.in\",\n    \"password\": \"pistol\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["register"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Register - missing password (400)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test('error message indicates missing password', function () {",
-                  "    pm.expect(pm.response.json().error).to.eql('Missing password');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"eve.holt@reqres.in\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["register"]
+              "path": ["auth", "login"]
             }
           },
           "response": []
@@ -639,10 +558,10 @@
       ]
     },
     {
-      "name": "Colors",
+      "name": "Products",
       "item": [
         {
-          "name": "List colors",
+          "name": "List products",
           "event": [
             {
               "listen": "test",
@@ -655,13 +574,13 @@
                   "",
                   "var jsonData = pm.response.json();",
                   "",
-                  "pm.test('data array is not empty', function () {",
-                  "    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;",
+                  "pm.test('products array is not empty', function () {",
+                  "    pm.expect(jsonData.products).to.be.an('array').that.is.not.empty;",
                   "});",
                   "",
-                  "pm.test('first color has id and name', function () {",
-                  "    pm.expect(jsonData.data[0]).to.have.property('id');",
-                  "    pm.expect(jsonData.data[0]).to.have.property('name');",
+                  "pm.test('first product has id and title', function () {",
+                  "    pm.expect(jsonData.products[0]).to.have.property('id');",
+                  "    pm.expect(jsonData.products[0]).to.have.property('title');",
                   "});"
                 ]
               }
@@ -669,22 +588,23 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/unknown",
+              "raw": "{{baseUrl}}/products?limit=10",
               "host": ["{{baseUrl}}"],
-              "path": ["unknown"]
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
             }
           },
           "response": []
         },
         {
-          "name": "Get color - not found (404)",
+          "name": "Get product - not found (404)",
           "event": [
             {
               "listen": "test",
@@ -693,6 +613,10 @@
                 "exec": [
                   "pm.test('Status code is 404', function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('error message indicates product not found', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql(\"Product with id '9999' not found\");",
                   "});"
                 ]
               }
@@ -700,16 +624,11 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apiKey}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/unknown/99",
+              "raw": "{{baseUrl}}/products/9999",
               "host": ["{{baseUrl}}"],
-              "path": ["unknown", "99"]
+              "path": ["products", "9999"]
             }
           },
           "response": []
@@ -736,11 +655,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://reqres.in/api"
-    },
-    {
-      "key": "apiKey",
-      "value": "reqres-free-v1"
+      "value": "https://dummyjson.com"
     }
   ]
 }

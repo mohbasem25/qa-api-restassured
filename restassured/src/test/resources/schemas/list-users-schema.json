@@ -2,32 +2,23 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "List Users Response",
   "type": "object",
-  "required": ["page", "per_page", "total", "total_pages", "data", "support"],
+  "required": ["users", "total", "skip", "limit"],
   "properties": {
-    "page": { "type": "integer" },
-    "per_page": { "type": "integer" },
     "total": { "type": "integer" },
-    "total_pages": { "type": "integer" },
-    "data": {
+    "skip": { "type": "integer" },
+    "limit": { "type": "integer" },
+    "users": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "email", "first_name", "last_name", "avatar"],
+        "required": ["id", "firstName", "lastName", "email", "username"],
         "properties": {
           "id": { "type": "integer" },
-          "email": { "type": "string", "format": "email" },
-          "first_name": { "type": "string" },
-          "last_name": { "type": "string" },
-          "avatar": { "type": "string" }
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string" },
+          "username": { "type": "string" }
         }
-      }
-    },
-    "support": {
-      "type": "object",
-      "required": ["url", "text"],
-      "properties": {
-        "url": { "type": "string" },
-        "text": { "type": "string" }
       }
     }
   }

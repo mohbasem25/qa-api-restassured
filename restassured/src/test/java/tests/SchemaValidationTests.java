@@ -26,10 +26,11 @@ public class SchemaValidationTests extends BaseTest {
                 .body(matchesJsonSchemaInClasspath("schemas/user-schema.json"));
     }
 
-    @Test(description = "GET /users?page= response matches the list-users JSON schema")
+    @Test(description = "GET /users?limit=&skip= response matches the list-users JSON schema")
     public void listUsersResponseMatchesSchema() {
         given()
-                .queryParam("page", 1)
+                .queryParam("limit", 10)
+                .queryParam("skip", 0)
         .when()
                 .get("/users")
         .then()
@@ -37,29 +38,29 @@ public class SchemaValidationTests extends BaseTest {
                 .body(matchesJsonSchemaInClasspath("schemas/list-users-schema.json"));
     }
 
-    @Test(description = "POST /users response matches the create-user JSON schema")
+    @Test(description = "POST /users/add response matches the create-user JSON schema")
     public void createUserResponseMatchesSchema() {
         CreateUserRequest payload = new CreateUserRequest("Morpheus", "Leader");
 
         given()
                 .body(payload)
         .when()
-                .post("/users")
+                .post("/users/add")
         .then()
                 .statusCode(201)
                 .body(matchesJsonSchemaInClasspath("schemas/create-user-schema.json"));
     }
 
-    @Test(description = "POST /register response matches the register JSON schema")
-    public void registerResponseMatchesSchema() {
-        LoginRequest payload = new LoginRequest("eve.holt@reqres.in", "pistol");
+    @Test(description = "POST /auth/login response matches the login JSON schema")
+    public void loginResponseMatchesSchema() {
+        LoginRequest payload = new LoginRequest("emilys", "emilyspass");
 
         given()
                 .body(payload)
         .when()
-                .post("/register")
+                .post("/auth/login")
         .then()
                 .statusCode(200)
-                .body(matchesJsonSchemaInClasspath("schemas/register-schema.json"));
+                .body(matchesJsonSchemaInClasspath("schemas/login-schema.json"));
     }
 }

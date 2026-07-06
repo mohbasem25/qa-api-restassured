@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request body for {@code POST /api/users} (and reused for
- * {@code PUT}/{@code PATCH /api/users/{id}}).
+ * Request body for {@code POST /users/add} (and reused for
+ * {@code PUT}/{@code PATCH /users/{id}}).
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUserRequest {
-    private String name;
-    private String job;
+    private String firstName;
+    private String lastName;
 }

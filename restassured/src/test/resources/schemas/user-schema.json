@@ -2,27 +2,14 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Single User Response",
   "type": "object",
-  "required": ["data", "support"],
+  "required": ["id", "firstName", "lastName", "email", "username", "gender", "image"],
   "properties": {
-    "data": {
-      "type": "object",
-      "required": ["id", "email", "first_name", "last_name", "avatar"],
-      "properties": {
-        "id": { "type": "integer" },
-        "email": { "type": "string", "format": "email" },
-        "first_name": { "type": "string" },
-        "last_name": { "type": "string" },
-        "avatar": { "type": "string" }
-      },
-      "additionalProperties": false
-    },
-    "support": {
-      "type": "object",
-      "required": ["url", "text"],
-      "properties": {
-        "url": { "type": "string" },
-        "text": { "type": "string" }
-      }
-    }
+    "id": { "type": "integer" },
+    "firstName": { "type": "string" },
+    "lastName": { "type": "string" },
+    "email": { "type": "string" },
+    "username": { "type": "string" },
+    "gender": { "type": "string" },
+    "image": { "type": "string" }
   }
 }

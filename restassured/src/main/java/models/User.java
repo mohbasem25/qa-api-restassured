@@ -6,9 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents a single user resource as returned by
- * {@code GET /api/users/{id}} and within the {@code data} array of
- * {@code GET /api/users?page=}.
+ * Represents a (partial) user resource as returned by
+ * {@code GET /users/{id}} and within the {@code users} array of
+ * {@code GET /users?limit=&skip=}.
+ * <p>
+ * dummyjson.com users have many more fields (address, bank, company, etc.)
+ * than are modelled here; only the fields this suite actually asserts on are
+ * declared, and {@link JsonIgnoreProperties} ensures the rest are silently
+ * ignored during deserialization rather than breaking the mapping.
  */
 @Data
 @NoArgsConstructor
@@ -16,8 +21,10 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     private int id;
+    private String firstName;
+    private String lastName;
     private String email;
-    private String first_name;
-    private String last_name;
-    private String avatar;
+    private String username;
+    private String gender;
+    private String image;
 }

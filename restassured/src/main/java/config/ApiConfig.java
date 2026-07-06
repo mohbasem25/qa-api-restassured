@@ -9,7 +9,7 @@ import java.util.Properties;
  * <p>
  * Values are sourced from {@code config.properties} on the classpath and can
  * be overridden at runtime via JVM system properties, e.g.:
- * {@code mvn test -Dbase.uri=https://reqres.in -Dapi.key.value=reqres-free-v1}
+ * {@code mvn test -Dbase.uri=https://dummyjson.com}
  * <p>
  * This indirection keeps environment/secret concerns out of test code and
  * makes the suite portable across local, CI, and other environments.
@@ -44,14 +44,6 @@ public final class ApiConfig {
 
     public static String basePath() {
         return get("base.path");
-    }
-
-    public static String apiKeyHeader() {
-        return get("api.key.header");
-    }
-
-    public static String apiKeyValue() {
-        return get("api.key.value");
     }
 
     public static int connectionTimeoutMs() {

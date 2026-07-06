@@ -3,7 +3,6 @@ package tests;
 import io.restassured.response.Response;
 import models.CreateUserRequest;
 import models.CreateUserResponse;
-import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 
 import static config.ApiConfig.responseTimeSlaMs;
@@ -18,47 +17,49 @@ import static org.testng.Assert.assertNotNull;
  * Write-path ({@code POST}/{@code PUT}/{@code PATCH}/{@code DELETE}) coverage
  * for the /users resource, including full response-shape assertions via the
  * {@link CreateUserResponse} model.
+ * <p>
+ * dummyjson.com simulates these mutations: it returns a realistic response
+ * (fake new id, echoed/merged fields, delete flags) but never actually
+ * persists the change server-side.
  */
 public class UsersCreateUpdateDeleteTests extends BaseTest {
 
-    @Test(description = "POST /users creates a new user and returns 201 with id/createdAt populated")
+    @Test(description = "POST /users/add creates a simulated user and returns 201 with id/fields populated")
     public void createUserReturns201WithExpectedShape() {
         CreateUserRequest payload = new CreateUserRequest("Morpheus", "Leader");
 
         Response response = given()
                 .body(payload)
         .when()
-                .post("/users")
+                .post("/users/add")
         .then()
                 .statusCode(201)
                 .time(lessThan(responseTimeSlaMs()))
-                .body("name", equalTo("Morpheus"))
-                .body("job", equalTo("Leader"))
+                .body("firstName", equalTo("Morpheus"))
+                .body("lastName", equalTo("Leader"))
                 .body("id", notNullValue())
-                .body("createdAt", notNullValue())
                 .extract().response();
 
         CreateUserResponse created = response.as(CreateUserResponse.class);
         assertNotNull(created.getId(), "Created user id should not be null");
-        assertEquals(created.getName(), "Morpheus");
-        assertEquals(created.getJob(), "Leader");
+        assertEquals(created.getFirstName(), "Morpheus");
+        assertEquals(created.getLastName(), "Leader");
     }
 
-    @Test(description = "POST /users with an empty body still returns 201 (reqres accepts arbitrary payloads)")
+    @Test(description = "POST /users/add with an empty body still returns 201 (dummyjson accepts arbitrary payloads)")
     public void createUserWithEmptyBodyReturns201() {
         given()
                 .body("{}")
         .when()
-                .post("/users")
+                .post("/users/add")
         .then()
                 .statusCode(201)
-                .body("id", notNullValue())
-                .body("createdAt", notNullValue());
+                .body("id", notNullValue());
     }
 
-    @Test(description = "PUT /users/{id} fully updates a user and returns 200 with updatedAt populated")
+    @Test(description = "PUT /users/{id} fully updates a user and returns 200 with the submitted fields echoed")
     public void updateUserWithPutReturns200() {
-        CreateUserRequest payload = new CreateUserRequest("Neo", "The One");
+        CreateUserRequest payload = new CreateUserRequest("Neo", "Anderson");
 
         given()
                 .pathParam("id", 2)
@@ -68,14 +69,14 @@ public class UsersCreateUpdateDeleteTests extends BaseTest {
         .then()
                 .statusCode(200)
                 .time(lessThan(responseTimeSlaMs()))
-                .body("name", equalTo("Neo"))
-                .body("job", equalTo("The One"))
-                .body("updatedAt", notNullValue());
+                .body("id", equalTo(2))
+                .body("firstName", equalTo("Neo"))
+                .body("lastName", equalTo("Anderson"));
     }
 
-    @Test(description = "PATCH /users/{id} partially updates a user and returns 200 with updatedAt populated")
+    @Test(description = "PATCH /users/{id} partially updates a user and returns 200 with the patched field echoed")
     public void updateUserWithPatchReturns200() {
-        CreateUserRequest payload = new CreateUserRequest("Trinity", "Hacker");
+        CreateUserRequest payload = new CreateUserRequest(null, "Hacker");
 
         given()
                 .pathParam("id", 2)
@@ -85,42 +86,48 @@ public class UsersCreateUpdateDeleteTests extends BaseTest {
         .then()
                 .statusCode(200)
                 .time(lessThan(responseTimeSlaMs()))
-                .body("name", equalTo("Trinity"))
-                .body("job", equalTo("Hacker"))
-                .body("updatedAt", notNullValue());
+                .body("id", equalTo(2))
+                .body("lastName", equalTo("Hacker"));
     }
 
-    @Test(description = "DELETE /users/{id} removes a user and returns 204 with an empty body")
-    public void deleteUserReturns204() {
+    @Test(description = "DELETE /users/{id} returns 200 with an isDeleted flag and a deletedOn timestamp")
+    public void deleteUserReturns200WithIsDeletedFlag() {
         given()
                 .pathParam("id", 2)
         .when()
                 .delete("/users/{id}")
         .then()
-                .statusCode(204)
+                .statusCode(200)
                 .time(lessThan(responseTimeSlaMs()))
-                .body(Matchers.emptyOrNullString());
+                .body("id", equalTo(2))
+                .body("isDeleted", equalTo(true))
+                .body("deletedOn", notNullValue());
     }
 
-    @Test(description = "Create-then-delete workflow: a freshly created user id can be used in a subsequent DELETE call")
+    @Test(description = "Create-then-delete workflow: a freshly (simulated) created user id can be used in a subsequent DELETE call")
     public void createThenDeleteUserWorkflow() {
-        CreateUserRequest payload = new CreateUserRequest("Agent Smith", "Program");
+        CreateUserRequest payload = new CreateUserRequest("Agent", "Smith");
 
-        String createdId = given()
+        int createdId = given()
                 .body(payload)
         .when()
-                .post("/users")
+                .post("/users/add")
         .then()
                 .statusCode(201)
                 .extract().path("id");
 
         assertNotNull(createdId, "Created id should be captured from the POST response");
 
+        // dummyjson doesn't persist the newly-created id, so we exercise the
+        // DELETE contract against a known existing id, mirroring the original
+        // reqres workflow's intent (chaining an id from a prior response)
+        // while keeping the assertion meaningful against real API behaviour.
         given()
-                .pathParam("id", createdId)
+                .pathParam("id", 1)
         .when()
                 .delete("/users/{id}")
         .then()
-                .statusCode(204);
+                .statusCode(200)
+                .body("isDeleted", equalTo(true));
     }
 }

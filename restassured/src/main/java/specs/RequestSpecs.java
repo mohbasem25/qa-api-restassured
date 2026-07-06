@@ -16,9 +16,13 @@ import java.io.PrintStream;
  * Reusable {@link RequestSpecification} builders.
  * <p>
  * Every request built through this class automatically carries the base URI,
- * base path, the {@code x-api-key} header required by reqres.in's free tier,
  * sane connection/socket timeouts, and request/response logging that is only
  * emitted when a test fails (keeps CI logs readable on the happy path).
+ * <p>
+ * dummyjson.com is a genuinely free, public test API that requires no API
+ * key or authentication header for any of the endpoints exercised by this
+ * suite, which is exactly why it was chosen for an unauthenticated,
+ * publicly-runnable CI pipeline.
  */
 public final class RequestSpecs {
 
@@ -27,8 +31,8 @@ public final class RequestSpecs {
     }
 
     /**
-     * Base spec shared by all requests: base URI/path, API key header,
-     * JSON content type, timeouts, and failure-only logging.
+     * Base spec shared by all requests: base URI/path, JSON content type,
+     * timeouts, and failure-only logging.
      */
     public static RequestSpecification baseSpec() {
         PrintStream logStream = System.out;
@@ -43,24 +47,10 @@ public final class RequestSpecs {
                 .setBasePath(ApiConfig.basePath())
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
-                .addHeader(ApiConfig.apiKeyHeader(), ApiConfig.apiKeyValue())
                 .setConfig(config)
                 // Logging filters fire only when a test assertion fails.
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL, logStream))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL, logStream))
-                .build();
-    }
-
-    /**
-     * Same as {@link #baseSpec()} but without any auth header, used to
-     * exercise/verify the API's behaviour when the API key is missing.
-     */
-    public static RequestSpecification specWithoutApiKey() {
-        return new RequestSpecBuilder()
-                .setBaseUri(ApiConfig.baseUri())
-                .setBasePath(ApiConfig.basePath())
-                .setContentType(ContentType.JSON)
-                .setAccept(ContentType.JSON)
                 .build();
     }
 }
