@@ -1,5 +1,7 @@
 # qa-api-restassured
 
+[![CI](https://github.com/mohbasem25/qa-api-restassured/actions/workflows/api-tests.yml/badge.svg)](https://github.com/mohbasem25/qa-api-restassured/actions/workflows/api-tests.yml)
+
 API test automation portfolio project covering the same target API with two
 complementary, industry-standard approaches:
 
